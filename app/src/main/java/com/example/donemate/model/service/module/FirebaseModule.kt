@@ -21,4 +21,10 @@ object FirebaseModule {
         val auth = FirebaseAuth.getInstance()
         return auth
     }
+    @Provides
+    @Singleton
+    fun firestore(): FirebaseFirestore{
+        val firestore = FirebaseFirestore.getInstance()
+        return firestore
+    }
 }

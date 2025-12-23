@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.GMobiledata
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -35,7 +32,8 @@ import com.example.donemate.model.service.impl.AuthResult
 @Composable
 fun SignInScreen(
     navigateToSignUp: () -> Unit,
-    vm: SignInViewModel
+    vm: SignInViewModel,
+    navigateToTasks: () -> Boolean,
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val isLogged by vm.hasUser.collectAsStateWithLifecycle(false)
@@ -52,6 +50,11 @@ fun SignInScreen(
         }
     }
 
+    LaunchedEffect(isLogged) {
+        if(isLogged) {
+            navigateToTasks()
+        }
+    }
 
     Scaffold(
         snackbarHost = {
