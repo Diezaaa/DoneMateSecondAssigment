@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.donemate.model.service.impl.AuthResult
 import androidx.compose.material3.SnackbarHost
+import com.example.donemate.ui.common.AuthenticationButton
+import com.example.donemate.ui.common.launchCredManBottomSheet
 
 
 @Composable
@@ -50,6 +52,12 @@ fun SignUpScreen(navigateToSignIn: () -> Unit, vm: SignUpViewModel, navigateToTa
     LaunchedEffect(isLogged) {
         if(isLogged) {
             navigateToTasks()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        launchCredManBottomSheet(context) { result ->
+            vm.onSignUpWithGoogle(result)
         }
     }
 
@@ -97,6 +105,11 @@ fun SignUpScreen(navigateToSignIn: () -> Unit, vm: SignUpViewModel, navigateToTa
                 }
 
                 Spacer(Modifier.height(8.dp))
+                Text("OR")
+                Spacer(Modifier.height(8.dp))
+                AuthenticationButton("Sign in with Google") { credential ->
+                    vm.onSignUpWithGoogle(credential)
+                }
                 Text(text = "Continue without account", modifier = Modifier.clickable {
                     vm.onContinueAnonymously()
                 })

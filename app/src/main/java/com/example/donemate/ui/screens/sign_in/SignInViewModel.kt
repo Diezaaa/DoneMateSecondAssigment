@@ -47,6 +47,17 @@ class SignInViewModel @Inject constructor(
             _authState.value = accountService.authenticate(_uiState.value.email, _uiState.value.password)
         }
     }
+    fun onSignInWithGoogle(credential: Credential) {
+        viewModelScope.launch {
+            if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                accountService.signInWithGoogle(googleIdTokenCredential.idToken)
+            } else {
+                Log.e("ERROR_TAG", "Er")
+            }
+        }
+    }
+
     fun onContinueAnonymously() {
         viewModelScope.launch {
             accountService.createAnonymousAccount()

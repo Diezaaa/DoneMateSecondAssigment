@@ -38,6 +38,8 @@ import com.example.donemate.ui.screens.account.AccountScreen
 import com.example.donemate.ui.screens.account.AccountViewModel
 import com.example.donemate.ui.screens.link_account.LinkAccountScreen
 import com.example.donemate.ui.screens.link_account.LinkAccountViewModel
+import com.example.donemate.ui.screens.reset_password.ResetPasswordScreen
+import com.example.donemate.ui.screens.reset_password.ResetPasswordViewModel
 
 @Serializable
 data object SignUp : NavKey
@@ -129,7 +131,10 @@ fun DoneMateApp() {
                             navigateToTasks = {
                                 backStack.clear()
                                 backStack.add(Tasks)
-                            }, vm = viewModel)
+                            }, vm = viewModel,
+                            navigateToResetPassword ={
+                                backStack.add(ResetPassword)
+                            })
                     }
                     entry<Tasks> {
                         val viewModel = hiltViewModel<TasksViewModel>()
@@ -173,6 +178,16 @@ fun DoneMateApp() {
                             navigateToTasks = {
                                 backStack.clear()
                                 backStack.add(Tasks) },
+                            vm = vm
+                        )
+                    }
+                    entry<ResetPassword> {
+                        val vm = hiltViewModel<ResetPasswordViewModel>()
+                        ResetPasswordScreen(
+                            navigateToSignIn = {
+                                backStack.removeLastOrNull()
+                                backStack.add(SignIn)
+                            },
                             vm = vm
                         )
                     }

@@ -54,6 +54,8 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override suspend fun createAnonymousAccount() {
         auth.signInAnonymously().await()
     }
+
+
     override suspend fun linkAccount(email: String, password: String): AuthResult {
 
         return try {
@@ -83,6 +85,15 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         auth.signOut()
     }
 
+    override suspend fun resetPassword(email: String): AuthResult {
+        return try {
+            auth.sendPasswordResetEmail(email)
+            AuthResult.Success
+        }
+        catch (e: Exception){
+            AuthResult.Error("Something went wrong")
+        }
+    }
 
     override suspend fun createAccount(email: String, password: String): AuthResult {
         return try {
@@ -92,5 +103,10 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
             AuthResult.Error("Something went wrong")
         }
     }
-}
 
+
+    override suspend fun signInWithGoogle(idToken: String) {
+        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(firebaseCredential).await()
+    }
+}

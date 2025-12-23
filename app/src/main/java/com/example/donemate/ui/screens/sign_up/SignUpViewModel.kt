@@ -37,7 +37,16 @@ class SignUpViewModel @Inject constructor(
     )
 
 
-
+    fun onSignUpWithGoogle(credential: Credential) {
+        viewModelScope.launch {
+            if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                accountService.signInWithGoogle(googleIdTokenCredential.idToken)
+            } else {
+                Log.e("ERROR_TAG", "Er")
+            }
+        }
+    }
     fun onEmailChange(newValue: String) {
         _uiState.value = _uiState.value.copy(email = newValue)
     }
