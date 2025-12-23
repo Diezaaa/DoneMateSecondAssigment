@@ -6,14 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -34,13 +30,20 @@ import com.example.donemate.ui.screens.tasks.TasksScreen
 import com.example.donemate.ui.screens.tasks.TasksViewModel
 import com.example.donemate.ui.theme.DoneMateTheme
 import kotlinx.serialization.Serializable
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.donemate.ui.screens.account.AccountScreen
+import com.example.donemate.ui.screens.account.AccountViewModel
+import com.example.donemate.ui.screens.link_account.LinkAccountScreen
+import com.example.donemate.ui.screens.link_account.LinkAccountViewModel
 
 @Serializable
 data object SignUp : NavKey
 
 @Serializable
 data object SignIn : NavKey
-
 
 @Serializable
 data object Tasks : TopLevelRoute { override val icon = Icons.Default.Menu }
@@ -51,6 +54,9 @@ data class Edit(val id: String) : NavKey
 @Serializable
 data object Add : NavKey
 
+@Serializable
+data object LinkAccount : NavKey
+
 private sealed interface TopLevelRoute : NavKey {
     val icon: ImageVector
 }
@@ -58,7 +64,10 @@ private sealed interface TopLevelRoute : NavKey {
 data object Account : TopLevelRoute { override val icon = Icons.Default.AccountCircle }
 
 @Serializable
+data object ResetPassword : NavKey
+
 private val TOP_LEVEL_ROUTES : List<TopLevelRoute> = listOf(Tasks, Account)
+
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -69,7 +78,6 @@ fun DoneMateApp() {
         val saveableStateDecorator = rememberSaveableStateHolderNavEntryDecorator<NavKey>()
         val currentDestination = backStack.lastOrNull()
         val showBottomBar = currentDestination in TOP_LEVEL_ROUTES
-
 
         Scaffold(
             bottomBar = {
@@ -101,8 +109,8 @@ fun DoneMateApp() {
                     viewModelDecorator
                 ),
                 modifier = Modifier
-                    .padding(innerPadding)
                     .systemBarsPadding()
+                    .padding(innerPadding)
                     .padding(10.dp, 0.dp),
                 entryProvider = entryProvider {
                     entry<SignUp> {
@@ -110,21 +118,18 @@ fun DoneMateApp() {
                         SignUpScreen(
                             navigateToTasks = {
                                 backStack.clear()
-                                backStack.add(Tasks)
-                            },
+                                backStack.add(Tasks) },
                             navigateToSignIn = { backStack.add(SignIn) },
                             vm = viewModel
                         )
                     }
                     entry<SignIn> {
                         val viewModel = hiltViewModel<SignInViewModel>()
-                        SignInScreen(
-                            navigateToSignUp = { backStack.add(SignUp) },
+                        SignInScreen(navigateToSignUp = { backStack.add(SignUp) },
                             navigateToTasks = {
                                 backStack.clear()
                                 backStack.add(Tasks)
-                            }, vm = viewModel
-                        )
+                            }, vm = viewModel)
                     }
                     entry<Tasks> {
                         val viewModel = hiltViewModel<TasksViewModel>()
@@ -137,10 +142,8 @@ fun DoneMateApp() {
                     entry<Edit> { task ->
                         val vm = hiltViewModel<EditViewModel>()
                         EditScreen(
-                            navigateToTasks = {
-                                backStack.removeLastOrNull()
-                                backStack.add(Tasks)
-                            },
+                            navigateToTasks = {backStack.removeLastOrNull()
+                                backStack.add(Tasks)},
                             id = task.id,
                             vm = vm
                         )
@@ -148,10 +151,28 @@ fun DoneMateApp() {
                     entry<Add> {
                         val vm = hiltViewModel<AddViewModel>()
                         AddScreen(
-                            navigateToTasks = {
-                                backStack.removeLastOrNull()
-                                backStack.add(Tasks)
+                            navigateToTasks = {backStack.removeLastOrNull()
+                                backStack.add(Tasks)},
+                            vm = vm
+                        )
+                    }
+                    entry<Account> {
+                        val vm = hiltViewModel<AccountViewModel>()
+                        AccountScreen(
+                            navigateToSignIn = {backStack.clear()
+                                backStack.add(SignIn)},
+                            navigateToLinkAccount = {
+                                backStack.add(LinkAccount)
                             },
+                            vm = vm,
+                        )
+                    }
+                    entry<LinkAccount> {
+                        val vm = hiltViewModel<LinkAccountViewModel>()
+                        LinkAccountScreen(
+                            navigateToTasks = {
+                                backStack.clear()
+                                backStack.add(Tasks) },
                             vm = vm
                         )
                     }

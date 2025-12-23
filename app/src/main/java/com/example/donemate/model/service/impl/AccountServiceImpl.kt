@@ -54,6 +54,35 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override suspend fun createAnonymousAccount() {
         auth.signInAnonymously().await()
     }
+    override suspend fun linkAccount(email: String, password: String): AuthResult {
+
+        return try {
+            val credential = EmailAuthProvider.getCredential(email, password)
+            auth.currentUser!!.linkWithCredential(credential).await()
+            AuthResult.Success
+        } catch (e: Exception) {
+            AuthResult.Error("Something went wrong")
+        }
+    }
+
+    override suspend fun deleteAccount(): AuthResult {
+        return try {
+            auth.currentUser!!.delete().await()
+            AuthResult.Success
+        } catch (e: FirebaseAuthRecentLoginRequiredException) {
+            AuthResult.Error("Re-login and then try again")
+        } catch (e: Exception) {
+            AuthResult.Error("Something went wrong")
+        }
+    }
+
+    override suspend fun signOut() {
+        if (auth.currentUser!!.isAnonymous) {
+            auth.currentUser!!.delete()
+        }
+        auth.signOut()
+    }
+
 
     override suspend fun createAccount(email: String, password: String): AuthResult {
         return try {
